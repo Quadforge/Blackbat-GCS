@@ -1,17 +1,23 @@
 package codyfinn.me.blackbat_gcs;
 
-import android.support.v7.app.ActionBarActivity;
+import android.app.FragmentManager;
+import android.net.Uri;
+import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends FragmentActivity implements FlightDataFragment.OnFragmentInteractionListener, PlanningFragment.OnFragmentInteractionListener, PlanningFragment.GetWaypointToggler{
+
+    public static FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        fragmentManager = getFragmentManager();
     }
 
     @Override
@@ -34,5 +40,16 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
+
+
+    @Override
+    public void onWaypointToggled(boolean isActive) {
+        
     }
 }
