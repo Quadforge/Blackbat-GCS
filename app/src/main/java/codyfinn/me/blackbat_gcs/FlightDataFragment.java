@@ -1,12 +1,15 @@
 package codyfinn.me.blackbat_gcs;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ToggleButton;
 
 
 /**
@@ -106,4 +109,7 @@ public class FlightDataFragment extends Fragment {
         public void onFragmentInteraction(Uri uri);
     }
 
+    public ToggleButton getWaypointToggleButton(){
+        return (ToggleButton) getView().findViewById(R.id.waypoint_button);
+    }
 }

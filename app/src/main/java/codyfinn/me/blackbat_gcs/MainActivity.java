@@ -4,13 +4,19 @@ import android.app.FragmentManager;
 import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ToggleButton;
 
 
-public class MainActivity extends FragmentActivity implements FlightDataFragment.OnFragmentInteractionListener, PlanningFragment.OnFragmentInteractionListener, PlanningFragment.GetWaypointToggler{
+public class MainActivity extends FragmentActivity implements FlightDataFragment.OnFragmentInteractionListener, PlanningFragment.OnFragmentInteractionListener{
 
     public static FragmentManager fragmentManager;
+    ToggleButton waypointButton;
+    FlightDataFragment flightDataFragment;
+
+    public final String TAG = "blackbat-gcs";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,6 +24,8 @@ public class MainActivity extends FragmentActivity implements FlightDataFragment
         setContentView(R.layout.activity_main);
 
         fragmentManager = getFragmentManager();
+        flightDataFragment = (FlightDataFragment) fragmentManager.findFragmentById(R.id.fragment_flight_data);
+        waypointButton = flightDataFragment.getWaypointToggleButton();
     }
 
     @Override
@@ -49,7 +57,8 @@ public class MainActivity extends FragmentActivity implements FlightDataFragment
 
 
     @Override
-    public void onWaypointToggled(boolean isActive) {
-        
+    public boolean onWaypointToggled() {
+        Log.i(TAG, "the toggle button state is: " + waypointButton.isChecked());
+        return waypointButton.isChecked();
     }
 }

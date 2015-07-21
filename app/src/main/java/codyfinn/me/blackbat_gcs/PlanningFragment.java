@@ -26,7 +26,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+
 public class PlanningFragment extends Fragment{
+
+    private static final String TAG = "blackbat-gcs";
+    PlanningFragment.OnFragmentInteractionListener mListener;
+    ArrayList<Marker> markerList = new ArrayList<Marker>();
 
     MapView mapView;
     GoogleMap map;
@@ -49,13 +55,46 @@ public class PlanningFragment extends Fragment{
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(0, 0), 10);
         map.animateCamera(cameraUpdate);
 
-        map.setOnMapClickListener(new GoogleMap.OnMapClickListener(){
+        map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                
+            }
+        });
+
+        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 
             @Override
             public void onMapClick(LatLng latLng) {
-                map.addMarker( new MarkerOptions()
-                                    .position(latLng)
-                                    .title("waypoint"));
+                if (mListener.onWaypointToggled()) {
+                    Marker marker = map.addMarker(new MarkerOptions()
+                            .position(latLng)
+                            .title(String.valueOf(markerList.size() + 1)));
+                    markerList.add(marker);
+                    Log.i(TAG, markerList.toString());
+                }
+            }
+        });
+
+        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+
+            int index;
+
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                if (mListener.onWaypointToggled()) {
+                    index = markerList.indexOf(marker);
+                    markerList.remove(index);
+                    marker.remove();
+                    markerList.trimToSize();
+                    for (int i = index; i < markerList.size(); i++){
+                        markerList.get(i).setTitle(String.valueOf(i+1));
+                    }
+                    return true;
+                }
+                else{
+                    return false;
+                }
             }
         });
 
@@ -74,13 +113,20 @@ public class PlanningFragment extends Fragment{
         mapView.onDestroy();
     }
 
+    @Override
+    public void onAttach(Activity activity){
+        super.onAttach(activity);
+        try {
+            mListener = (PlanningFragment.OnFragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement GetWaypointToggler");
+        }
+
+    }
+
     public interface OnFragmentInteractionListener {
         public void onFragmentInteraction(Uri uri);
+        public boolean onWaypointToggled();
     }
-
-    public interface GetWaypointToggler{
-        public void onWaypointToggled(boolean isActive);
-    }
-
-
 }
