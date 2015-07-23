@@ -9,21 +9,22 @@
         android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:text="New ToggleButton"
-        android:id="@+id/toggleButton"
+        android:id="@+id/connection_button"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:textOn="Disconnect"
-        android:textOff="Connect" />
+        android:textOff="Connect"
+        android:nestedScrollingEnabled="false" />
 
     <ToggleButton
         android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:text="New ToggleButton"
-        android:id="@+id/toggleButton2"
-        android:layout_below="@+id/toggleButton"
-        android:layout_alignLeft="@+id/toggleButton"
-        android:layout_alignStart="@+id/toggleButton"
+        android:id="@+id/arm_button"
+        android:layout_below="@+id/connection_button"
+        android:layout_alignLeft="@+id/connection_button"
+        android:layout_alignStart="@+id/connection_button"
         android:textOn="Disarm"
         android:textOff="Arm"
         android:layout_marginBottom="20dp" />
@@ -33,9 +34,9 @@
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_toLeftOf="@+id/toggleButton"
-        android:layout_toStartOf="@+id/toggleButton"
-        android:layout_alignBottom="@+id/toggleButton2">
+        android:layout_toLeftOf="@+id/connection_button"
+        android:layout_toStartOf="@+id/connection_button"
+        android:layout_alignBottom="@+id/arm_button">
 
         <TableRow
             android:layout_width="match_parent"

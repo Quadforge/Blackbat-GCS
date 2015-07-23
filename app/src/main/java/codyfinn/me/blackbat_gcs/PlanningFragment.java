@@ -1,6 +1,7 @@
 package codyfinn.me.blackbat_gcs;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -8,20 +9,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewManager;
-import android.widget.RelativeLayout;
-import android.widget.ToggleButton;
-
-import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -31,7 +24,7 @@ import java.util.ArrayList;
 public class PlanningFragment extends Fragment{
 
     private static final String TAG = "blackbat-gcs";
-    PlanningFragment.OnFragmentInteractionListener mListener;
+    PlanningFragment.OnPlanningFragmentInteractionListener mListener;
     ArrayList<Marker> markerList = new ArrayList<Marker>();
 
     MapView mapView;
@@ -58,7 +51,10 @@ public class PlanningFragment extends Fragment{
         map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
-                
+                if(mListener.onWaypointToggled()){
+                    DialogFragment newFragment = new ConfirmDeleteWaypointsDialogFragment();
+                    newFragment.show(getFragmentManager(), "Confirm waypoint deletion");
+                }
             }
         });
 
@@ -117,7 +113,7 @@ public class PlanningFragment extends Fragment{
     public void onAttach(Activity activity){
         super.onAttach(activity);
         try {
-            mListener = (PlanningFragment.OnFragmentInteractionListener) activity;
+            mListener = (PlanningFragment.OnPlanningFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement GetWaypointToggler");
@@ -125,8 +121,7 @@ public class PlanningFragment extends Fragment{
 
     }
 
-    public interface OnFragmentInteractionListener {
-        public void onFragmentInteraction(Uri uri);
+    public interface OnPlanningFragmentInteractionListener {
         public boolean onWaypointToggled();
     }
 }

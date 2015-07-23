@@ -4,6 +4,11 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
+    <string name="clear_waypoints">Are you sure you want to clear waypoints</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_super_drone">SuperDroneActivity</string>
 </resources>
