@@ -2,28 +2,40 @@ package codyfinn.me.blackbat_gcs;
 
 import android.app.DialogFragment;
 import android.app.FragmentManager;
-import android.net.Uri;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ToggleButton;
+import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.o3dr.android.client.ControlTower;
 import com.o3dr.android.client.Drone;
+import com.o3dr.android.client.apis.drone.DroneStateApi;
 import com.o3dr.android.client.interfaces.DroneListener;
 import com.o3dr.android.client.interfaces.TowerListener;
+import com.o3dr.services.android.lib.coordinate.LatLong;
+import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
+import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 import com.o3dr.services.android.lib.drone.connection.ConnectionType;
+import com.o3dr.services.android.lib.drone.mission.Mission;
+import com.o3dr.services.android.lib.drone.mission.MissionItemType;
+import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
+import com.o3dr.services.android.lib.drone.mission.item.spatial.Waypoint;
+import com.o3dr.services.android.lib.drone.property.State;
 import com.o3dr.services.android.lib.drone.property.Type;
 
+import java.util.ArrayList;
 
-public class MainActivity extends FragmentActivity implements FlightDataFragment.OnFlightDataFragmentInteractionListener,
-                                                              PlanningFragment.OnPlanningFragmentInteractionListener,
+
+public class MainActivity extends FragmentActivity implements PlanningFragment.OnPlanningFragmentInteractionListener,
                                                               ConfirmDeleteWaypointsDialogFragment.DeleteWaypointDialogListener,
+                                                              FlightDataFragment.OnFragmentInteractionListener,
                                                               DroneListener,
                                                               TowerListener{
 
@@ -105,12 +117,30 @@ public class MainActivity extends FragmentActivity implements FlightDataFragment
 
     @Override
     public void onDroneConnectionFailed(ConnectionResult connectionResult) {
-
+        alertUser("Drone not connected");
     }
 
     @Override
-    public void onDroneEvent(String s, Bundle bundle) {
-
+    public void onDroneEvent(String event, Bundle extras) {
+        switch (event){
+            case AttributeEvent.STATE_CONNECTED:
+                flightDataFragment.getConnectionToggleButton().setChecked(true);
+                alertUser("DroneConnected");
+                break;
+            case AttributeEvent.STATE_CONNECTING:
+                alertUser("Drone is connecting");
+            case AttributeEvent.STATE_DISCONNECTED:
+                flightDataFragment.getConnectionToggleButton().setChecked(false);
+                alertUser("Drone Disconnected");
+                flightDataFragment.getArmButton().setChecked(false);
+                break;
+            case AttributeEvent.STATE_ARMING:
+                alertUser("Drone Armed");
+                break;
+            case AttributeEvent.STATE_UPDATED:
+                State state = drone.getAttribute(AttributeType.STATE);
+                flightDataFragment.getArmButton().setChecked(!state.isArmed());
+        }
     }
 
     @Override
@@ -122,11 +152,12 @@ public class MainActivity extends FragmentActivity implements FlightDataFragment
     public void onTowerConnected() {
         controlTower.registerDrone(drone, handler);
         drone.registerDroneListener(this);
+        alertUser("Connected to 3DR services");
     }
 
     @Override
     public void onTowerDisconnected() {
-
+        alertUser("Disconnected from 3DR services");
     }
 
     //Fragment Listeners
@@ -137,7 +168,7 @@ public class MainActivity extends FragmentActivity implements FlightDataFragment
     }
 
     @Override
-    public boolean ConnectButtonTap() {
+    public void connectButtonTap() {
        if(drone.isConnected()){
            drone.disconnect();
        }
@@ -147,6 +178,35 @@ public class MainActivity extends FragmentActivity implements FlightDataFragment
            ConnectionParameter connectionParams = new ConnectionParameter(ConnectionType.TYPE_USB, extraParams, null);
            drone.connect(connectionParams);
        }
-        return drone.isConnected();
+    }
+
+    @Override
+    public void armButtonTap() {
+        if(drone.isConnected()) {
+            State currentState = drone.getAttribute(AttributeType.STATE);
+            DroneStateApi.arm(drone, !currentState.isArmed());
+        }
+        else{
+            alertUser("Drone is not connected so I cant arm");
+            flightDataFragment.getArmButton().setChecked(false);
+        }
+    }
+
+    protected void alertUser(String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+    }
+
+    Mission makeMission(ArrayList<Marker> markerList){
+        Mission mission = new Mission();
+        LatLng positon;
+        LatLongAlt newLatLongAlt;
+        Waypoint waypoint = new Waypoint();
+        for(int i = 0; i < markerList.size() - 1; i++){
+            positon = markerList.get(i).getPosition();
+            newLatLongAlt = new LatLongAlt(positon.latitude, positon.longitude, 0);
+            waypoint.setCoordinate(newLatLongAlt);
+            mission.addMissionItem(waypoint);
+        }
+        return mission;
     }
 }

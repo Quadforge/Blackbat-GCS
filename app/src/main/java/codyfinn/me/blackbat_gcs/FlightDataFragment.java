@@ -1,28 +1,23 @@
 package codyfinn.me.blackbat_gcs;
 
 import android.app.Activity;
-import android.app.FragmentManager;
-import android.content.DialogInterface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ToggleButton;
 
-import com.o3dr.android.client.interfaces.DroneListener;
-import com.o3dr.android.client.interfaces.TowerListener;
-import com.o3dr.services.android.lib.drone.connection.ConnectionResult;
 
-public class FlightDataFragment extends Fragment implements View.OnClickListener {
+public class FlightDataFragment extends Fragment implements View.OnClickListener{
 
     private static final String TAG = "Blackbat:FlightData: ";
-    private OnFlightDataFragmentInteractionListener mListener;
     private ToggleButton connectionToggleButton;
     private ToggleButton waypointToggleButton;
+    private ToggleButton armButton;
+
+    private OnFragmentInteractionListener mListener;
 
     public FlightDataFragment() {
         // Required empty public constructor
@@ -37,45 +32,60 @@ public class FlightDataFragment extends Fragment implements View.OnClickListener
         connectionToggleButton.setOnClickListener(this);
         waypointToggleButton = (ToggleButton) inflatedView.findViewById(R.id.waypoint_button);
         waypointToggleButton.setOnClickListener(this);
+        armButton = (ToggleButton) inflatedView.findViewById(R.id.arm_button);
+        armButton.setOnClickListener(this);
         return inflatedView;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnFlightDataFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
 
     @Override
     public void onClick(View v) {
-        switch(v.getId()){
+        switch (v.getId()) {
             case R.id.connection_button:
-                connectionToggleButton.setChecked(mListener.ConnectButtonTap());
-                Log.i(TAG, String.valueOf("value: " + mListener.ConnectButtonTap()));
+                mListener.connectButtonTap();
                 Log.i(TAG, "Connection button pressed");
                 break;
             case R.id.waypoint_button:
                 Log.i(TAG, "Waypoint button pressed");
                 break;
+            case R.id.arm_button:
+                mListener.armButtonTap();
+                Log.i(TAG, "armed button pressed");
+                break;
         }
     }
 
-    public interface OnFlightDataFragmentInteractionListener {
-        boolean ConnectButtonTap();
+    @Override
+    public void onAttach(Activity activity){
+        super.onAttach(activity);
+        try {
+            mListener = (FlightDataFragment.OnFragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement GetWaypointToggler");
+        }
+
     }
 
     public boolean getWaypointCheckedStatus(){
+
         return waypointToggleButton.isChecked();
+    }
+
+    public ToggleButton getConnectionToggleButton(){
+        return connectionToggleButton;
+    }
+
+    public ToggleButton getArmButton(){
+        return armButton;
+    }
+
+    public interface OnFragmentInteractionListener{
+        void connectButtonTap();
+        void armButtonTap();
     }
 }

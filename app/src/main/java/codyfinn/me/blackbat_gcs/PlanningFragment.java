@@ -124,4 +124,8 @@ public class PlanningFragment extends Fragment{
     public interface OnPlanningFragmentInteractionListener {
         public boolean onWaypointToggled();
     }
+
+    public ArrayList<Marker> getMarkerList(){
+        return markerList;
+    }
 }
