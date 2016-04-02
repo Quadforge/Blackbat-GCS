@@ -106,7 +106,6 @@ public class MainActivity extends FragmentActivity implements PlanningFragment.O
 
     @Override
     public void onDialogPositiveClick(DialogFragment dialog) {
-        planningFragment.map.clear();
         planningFragment.markerList.clear();
     }
 
