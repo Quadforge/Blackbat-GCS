@@ -26,4 +26,5 @@ dependencies {
     compile 'com.o3dr.android:dronekit-android:2.3.+'
     compile 'org.osmdroid:osmdroid-android:5.1@aar'
     compile 'org.osmdroid:osmdroid-third-party:5.0.1@aar'
+    compile 'com.github.MKergall.osmbonuspack:OSMBonusPack:v5.7'
 }

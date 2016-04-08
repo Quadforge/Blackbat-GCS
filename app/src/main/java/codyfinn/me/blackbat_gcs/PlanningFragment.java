@@ -9,13 +9,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.api.Marker;
+import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
+import org.osmdroid.events.MapEvent;
 import org.osmdroid.tileprovider.tilesource.bing.BingMapTileSource;
+import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
+import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
@@ -26,7 +33,7 @@ public class PlanningFragment extends Fragment{
 
     private static final String TAG = "blackbat-gcs";
     PlanningFragment.OnPlanningFragmentInteractionListener mListener;
-    ArrayList<Marker> markerList = new ArrayList<Marker>();
+    ArrayList<OverlayItem> markerList = new ArrayList<>();
 
     MapView mapView;
     MyLocationNewOverlay myLocationNewOverlay;
@@ -40,25 +47,22 @@ public class PlanningFragment extends Fragment{
 
         mResourceProxy = new DefaultResourceProxyImpl(getActivity());
         mapView = (MapView) view.findViewById(R.id.mapview);
+        mapView.setMinZoomLevel(10);
+        mapView.setMaxZoomLevel(20);
         mapController = mapView.getController();
         BingMapTileSource.retrieveBingKey(getActivity());
         String mLocale = Locale.getDefault().getDisplayName();
         BingMapTileSource bing = new BingMapTileSource(mLocale);
         bing.setStyle(BingMapTileSource.IMAGERYSET_AERIAL);
         mapView.setTileSource(bing);
-        mapView.setBuiltInZoomControls(true);
         mapView.setMultiTouchControls(true);
 
-        this.myLocationNewOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(getActivity()), mapView, mResourceProxy);
-        myLocationNewOverlay.runOnFirstFix(new Runnable() {
-            @Override
-            public void run() {
-                mapController.animateTo(myLocationNewOverlay.getMyLocation());
-            }
-        });
-        myLocationNewOverlay.disableMyLocation();
-        myLocationNewOverlay.disableFollowLocation();
+        myLocationNewOverlay = new MyLocationNewOverlay(mapView.getContext(), mapView);
+        myLocationNewOverlay.enableFollowLocation();
         mapView.getOverlays().add(this.myLocationNewOverlay);
+        myLocationNewOverlay.enableMyLocation();
+
+        mapController.setZoom(20);
 
         return view;
     }
@@ -89,7 +93,7 @@ public class PlanningFragment extends Fragment{
         public boolean onWaypointToggled();
     }
 
-    public ArrayList<Marker> getMarkerList(){
+    public ArrayList<OverlayItem> getMarkerList(){
         return markerList;
     }
 }
