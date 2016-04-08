@@ -1,0 +1,29 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:orientation="horizontal"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
+
+    <fragment
+        android:layout_width="310dp"
+        android:layout_height="wrap_content"
+        android:name="codyfinn.me.blackbat_gcs.FlightDataFragment"
+        android:id="@+id/fragment_flight_data"
+        android:layout_gravity="center_horizontal"
+        tools:layout="@layout/fragment_flight_data" />
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal"></FrameLayout>
+
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:name="codyfinn.me.blackbat_gcs.PlanningFragment"
+        android:id="@+id/fragment_planning"
+        tools:layout="@layout/fragment_planning"
+        android:layout_gravity="center_horizontal" />
+</LinearLayout>

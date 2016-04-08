@@ -1,45 +1,38 @@
 package codyfinn.me.blackbat_gcs;
 
 import android.app.Activity;
-import android.app.DialogFragment;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.api.IMapController;
-import org.osmdroid.api.Marker;
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
-import org.osmdroid.events.MapEvent;
+import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
+import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.tileprovider.tilesource.bing.BingMapTileSource;
-import org.osmdroid.util.BoundingBoxE6;
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.ItemizedIconOverlay;
-import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
-import org.osmdroid.views.overlay.OverlayItem;
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class PlanningFragment extends Fragment{
+public class PlanningFragment extends Fragment implements MapEventsReceiver{
 
     private static final String TAG = "blackbat-gcs";
     PlanningFragment.OnPlanningFragmentInteractionListener mListener;
-    ArrayList<OverlayItem> markerList = new ArrayList<>();
+    ArrayList<GeoPoint> markerList = new ArrayList<>();
+    ArrayList<Marker> markerIconList = new ArrayList<>();
 
     MapView mapView;
     MyLocationNewOverlay myLocationNewOverlay;
     IMapController mapController;
     ResourceProxy mResourceProxy;
-
+    MapEventsOverlay mMapEventsOverlay;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
@@ -57,12 +50,16 @@ public class PlanningFragment extends Fragment{
         mapView.setTileSource(bing);
         mapView.setMultiTouchControls(true);
 
+        mMapEventsOverlay = new MapEventsOverlay(getActivity(), this);
+
         myLocationNewOverlay = new MyLocationNewOverlay(mapView.getContext(), mapView);
         myLocationNewOverlay.enableFollowLocation();
         mapView.getOverlays().add(this.myLocationNewOverlay);
         myLocationNewOverlay.enableMyLocation();
 
         mapController.setZoom(20);
+
+        mapView.getOverlays().add(0, mMapEventsOverlay);
 
         return view;
     }
@@ -89,11 +86,33 @@ public class PlanningFragment extends Fragment{
 
     }
 
+    @Override
+    public boolean singleTapConfirmedHelper(GeoPoint p) {
+        if(mListener.onWaypointToggled()) {
+            markerList.add(p);
+            Marker marker = new Marker(mapView);
+            marker.setPosition(p);
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+
+            markerIconList.add(marker);
+            marker.setTitle(Integer.toString(markerIconList.size()));
+            mapView.getOverlays().add(marker);
+            mapView.invalidate();
+            return false;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean longPressHelper(GeoPoint p) {
+        return false;
+    }
+
     public interface OnPlanningFragmentInteractionListener {
         public boolean onWaypointToggled();
     }
 
-    public ArrayList<OverlayItem> getMarkerList(){
+    public ArrayList<GeoPoint> getMarkerList(){
         return markerList;
     }
 }
